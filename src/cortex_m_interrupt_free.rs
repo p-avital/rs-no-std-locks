@@ -8,6 +8,9 @@ pub struct ReentrantMutex<Data, Token> {
     counter: core::cell::UnsafeCell<usize>,
 }
 
+/// An interruption masking based  Reentrant Mutex. Reentrance is handled by comparing
+/// the token you pass as you try to lock it. An example of such token would be a pthread_t
+/// if you are using pthreads. Explicit token passing means that you are responsible for ensuring that you only pass the same token from calls that you know won't cause races.
 impl<Data, Token> HasContent for ReentrantMutex<Data, Token> {
     type ContentType = Data;
     fn get_content(&self) -> *mut Data {
@@ -59,6 +62,8 @@ impl<Data, Token> Unlockable for ReentrantMutex<Data, Token> {
     }
 }
 
+/// An interruption masking based non-reentrant lock. Simpler and faster than its reentrant
+/// counterpart, but you'll have to be careful about possible reentries.
 pub struct NonReentrantMutex<Data> {
     content: core::cell::UnsafeCell<Data>,
     locked: core::cell::UnsafeCell<bool>,
